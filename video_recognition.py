@@ -1,24 +1,38 @@
 from imageai.Detection import VideoObjectDetection
+import cv2
 import os
 
 
 class VideoRecognition:
 
-    def __init__(self, input_video, output_video):
-        execution_path = os.getcwd()
-        detector = VideoObjectDetection()
-        detector.setModelTypeAsRetinaNet()
-        detector.setModelPath(os.path.join(execution_path, "resnet50_coco_best_v2.0.1.h5"))
-        detector.loadModel()
-        video_path = detector.detectObjectsFromVideo(
-            input_file_path=os.path.join(execution_path, input_video),
-            output_file_path=os.path.join(execution_path, output_video),
-            frames_per_second=10,
-            per_second_function=self.forSeconds,
-            log_progress=True,
-            minimum_percentage_probability=50
-        )
-        print(video_path)
+    def __init__(self, output_video, input_video=0, type='fromVideo'):
+        self.execution_path = os.getcwd()
+        self.detector = VideoObjectDetection()
+        self.detector.setModelTypeAsRetinaNet()
+        self.detector.setModelPath(os.path.join(self.execution_path, "resnet50_coco_best_v2.0.1.h5"))
+        self.detector.loadModel()
+        self.start_process(output_video=output_video, input_video=input_video, type=type)
+        print(self.video_path)
+
+    def start_process(self, output_video, input_video, type):
+        if type == 'fromvideo':
+            self.video_path = self.detector.detectObjectsFromVideo(
+                input_file_path=os.path.join(self.execution_path, input_video),
+                output_file_path=os.path.join(self.execution_path, output_video),
+                frames_per_second=10,
+                per_second_function=self.forSeconds,
+                log_progress=True,
+                minimum_percentage_probability=50
+            )
+        else:
+            self.camera = cv2.VideoCapture(input_video)
+            self.video_path = self.detector.detectObjectsFromVideo(
+                camera_input=self.camera,
+                output_file_path=os.path.join(self.execution_path, output_video),
+                frames_per_second=10,
+                per_second_function=self.forSeconds,
+                log_progress=True,
+                minimum_percentage_probability=50)
 
     def forSeconds(self, second_number, output_arrays, count_arrays, average_output_count):
         print("SECOND : ", second_number)
@@ -30,4 +44,4 @@ class VideoRecognition:
         print("------------END OF A SECOND --------------")
 
 
-VideoRecognition(input_video='my_video.mp4', output_video='new_video')
+

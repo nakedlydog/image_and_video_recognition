@@ -6,6 +6,7 @@ import cv2
 from tkinter.filedialog import askopenfilename
 
 from _VideoCapture import _VideoCapture
+from video_recognition import VideoRecognition
 
 
 class App:
@@ -20,25 +21,43 @@ class App:
         self.canvas = tkinter.Canvas(window, width=700, height=400)
         self.canvas.pack()
 
-        self.button_play = tkinter.Button(window, text='Play', width=20, command=self.play)
-        self.button_play.pack(side=tkinter.LEFT) # , expand=True)
-
-        self.button_pause = tkinter.Button(window, text='Pause', width=20, command=self.pause)
-        self.button_pause.pack(side=tkinter.LEFT) # , expand=True)
-
-        self.button_choose_file = tkinter.Button(window, text='Choose video-file', width=20, command=self.choose_file)
-        self.button_choose_file.pack(side=tkinter.LEFT)
-
-        self.button_snapshot = tkinter.Button(window, text='Snapshot!', width=20, command=self.take_snapshot)
-        self.button_snapshot.pack(side=tkinter.LEFT)  # , expand=True)
+        self.init_buttons(window)
 
         self.is_pause_video = True
         self.is_new_video_choosen = False
+        self.count_analysed_video = 0
 
         self.delay = 15
         self.update()
 
         self.window.mainloop()
+
+    def init_buttons(self, window):
+        button_size = 15
+
+        self.button_play = tkinter.Button(window, text='Play', width=button_size, command=self.play)
+        self.button_play.pack(side=tkinter.LEFT)  # , expand=True)
+
+        self.button_pause = tkinter.Button(window, text='Pause', width=button_size, command=self.pause)
+        self.button_pause.pack(side=tkinter.LEFT)  # , expand=True)
+
+        self.button_choose_file = tkinter.Button(window, text='Choose video-file', width=button_size,
+                                                 command=self.choose_file)
+        self.button_choose_file.pack(side=tkinter.LEFT)
+
+        self.button_choose_builtin_camera = tkinter.Button(window, text='Choose my webcam', width=button_size,
+                                                           command=self.choose_builtin_camera)
+        self.button_choose_builtin_camera.pack(side=tkinter.LEFT)
+
+        self.analysis = tkinter.Button(window, text='Analysis', width=button_size, command=self.analysis)
+        self.analysis.pack(side=tkinter.LEFT)
+
+        self.play_analysed = tkinter.Button(window, text='Play Analysed', width=button_size,
+                                              command=self.play_analysed)
+        self.play_analysed.pack(side=tkinter.LEFT)
+
+        self.button_snapshot = tkinter.Button(window, text='Snapshot!', width=button_size, command=self.take_snapshot)
+        self.button_snapshot.pack(side=tkinter.LEFT)
 
     def update(self):
         print(22)
@@ -46,12 +65,10 @@ class App:
             self.video = _VideoCapture(self.path)
             self.is_new_video_choosen = False
 
-
-
         ret, frame = self.video.get_frame()
 
         while True:
-            if self.is_pause_video == False:
+            if not self.is_pause_video:
                 break
             self.window.update()
 
@@ -60,7 +77,6 @@ class App:
             image.thumbnail((750, 750), PIL.Image.ANTIALIAS)
             self.photo = PIL.ImageTk.PhotoImage(image=image)
             self.canvas.create_image(0, 0, image=self.photo, anchor=tkinter.NW)
-
 
         self.window.after(self.delay, self.update)
 
@@ -75,13 +91,29 @@ class App:
     def pause(self):
         self.is_pause_video = True
 
-    def choose_file(self):
-        self.path = askopenfilename(defaultextension='.mp4', filetypes=[('Video files', '*.mp4'), ('All files', '*.*')])
+    def change_input(self, input_file=0):
+        self.path = input_file
         self.is_new_video_choosen = True
         print(self.path)
 
+    def choose_file(self):
+        self.change_input(askopenfilename(defaultextension='.mp4', filetypes=[('Video files', '*.mp4'),
+                                                                              ('All files', '*.*')]))
+
+    def choose_builtin_camera(self):
+        self.change_input()
         # return text
 
+    def analysis(self):
+        self.count_analysed_video += 1
+        self.new_video_name = 'AnalysedVideo' + str(self.count_analysed_video)
+        if self.path:
+            VideoRecognition(output_video=self.new_video_name, input_video=self.path)
+        else:
+            VideoRecognition(output_video=self.new_video_name, type='fromCamera')
+
+    def play_analysed(self):
+        self.change_input(self.new_video_name)
 
 
 App(tkinter.Tk(), 'VideoAnalysis')
