@@ -7,6 +7,7 @@ from tkinter.filedialog import askopenfilename
 
 from _VideoCapture import _VideoCapture
 from video_recognition import VideoRecognition
+import threading
 
 
 class App:
@@ -34,7 +35,8 @@ class App:
 
     def init_buttons(self, window):
         button_size = 15
-
+        self.text = tkinter.Label(window, text='')
+        self.text.pack()
         self.button_play = tkinter.Button(window, text='Play', width=button_size, command=self.play)
         self.button_play.pack(side=tkinter.LEFT)  # , expand=True)
 
@@ -49,12 +51,16 @@ class App:
                                                            command=self.choose_builtin_camera)
         self.button_choose_builtin_camera.pack(side=tkinter.LEFT)
 
-        self.analysis = tkinter.Button(window, text='Analysis', width=button_size, command=self.analysis)
-        self.analysis.pack(side=tkinter.LEFT)
+        self.button_analysis = tkinter.Button(window, text='Analysis', width=button_size, command=self.analysis)
+        self.button_analysis.pack(side=tkinter.LEFT)
 
-        self.play_analysed = tkinter.Button(window, text='Play Analysed', width=button_size,
+        # self.button_stop_analys = tkinter.Button(window, text='Stop_analys', width=button_size,
+        #                                          command=self.stop_analys)
+        # self.button_stop_analys.pack(side=tkinter.LEFT)
+
+        self.button_play_analysed = tkinter.Button(window, text='Play Analysed', width=button_size,
                                               command=self.play_analysed)
-        self.play_analysed.pack(side=tkinter.LEFT)
+        self.button_play_analysed.pack(side=tkinter.LEFT)
 
         self.button_snapshot = tkinter.Button(window, text='Snapshot!', width=button_size, command=self.take_snapshot)
         self.button_snapshot.pack(side=tkinter.LEFT)
@@ -108,12 +114,18 @@ class App:
         self.count_analysed_video += 1
         self.new_video_name = 'AnalysedVideo' + str(self.count_analysed_video)
         if self.path:
-            VideoRecognition(output_video=self.new_video_name, input_video=self.path)
+            self.thread1 = threading.Thread(target = VideoRecognition,
+                                       args=(self.new_video_name, self.path))
+            self.thread1.start()
         else:
-            VideoRecognition(output_video=self.new_video_name, type='fromCamera')
+            self.thread2 = threading.Thread(target=VideoRecognition, args=(self.new_video_name, 0, 'fromCamera'))
+            self.thread2.start()
+            # self.button_play_analysed[state=]
 
     def play_analysed(self):
         self.change_input(self.new_video_name)
+
+
 
 
 App(tkinter.Tk(), 'VideoAnalysis')
