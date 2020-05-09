@@ -26,7 +26,7 @@ class App:
 
         self.is_pause_video = True
         self.is_new_video_choosen = False
-        self.count_analysed_video = 0
+        self.count_analyzed_video = 0
 
         self.delay = 15
         self.update()
@@ -54,13 +54,10 @@ class App:
         self.button_analysis = tkinter.Button(window, text='Analysis', width=button_size, command=self.analysis)
         self.button_analysis.pack(side=tkinter.LEFT)
 
-        # self.button_stop_analys = tkinter.Button(window, text='Stop_analys', width=button_size,
-        #                                          command=self.stop_analys)
-        # self.button_stop_analys.pack(side=tkinter.LEFT)
 
-        self.button_play_analysed = tkinter.Button(window, text='Play Analysed', width=button_size,
-                                              command=self.play_analysed)
-        self.button_play_analysed.pack(side=tkinter.LEFT)
+        self.button_play_analyzed = tkinter.Button(window, text='Play Analyzed', width=button_size,
+                                                   command=self.play_analyzed)
+        self.button_play_analyzed.pack(side=tkinter.LEFT)
 
         self.button_snapshot = tkinter.Button(window, text='Snapshot!', width=button_size, command=self.take_snapshot)
         self.button_snapshot.pack(side=tkinter.LEFT)
@@ -111,19 +108,20 @@ class App:
         # return text
 
     def analysis(self):
-        self.count_analysed_video += 1
-        self.new_video_name = 'AnalysedVideo' + str(self.count_analysed_video)
+        self.count_analyzed_video += 1
+        self.new_video_name = 'AnalyzedVideo' + str(self.count_analyzed_video)
         if self.path:
-            self.thread1 = threading.Thread(target = VideoRecognition,
+            self.thread1 = threading.Thread(target=VideoRecognition,
                                        args=(self.new_video_name, self.path))
             self.thread1.start()
         else:
             self.thread2 = threading.Thread(target=VideoRecognition, args=(self.new_video_name, 0, 'fromCamera'))
             self.thread2.start()
-            # self.button_play_analysed[state=]
+            # self.button_play_analyzed[state=]
 
-    def play_analysed(self):
-        self.change_input(self.new_video_name)
+    def play_analyzed(self):
+        self.change_input(self.new_video_name + '.avi')
+        self.text['text'] = VideoRecognition.text[-1]
 
 
 
@@ -131,9 +129,6 @@ class App:
 App(tkinter.Tk(), 'VideoAnalysis')
 
 
-
-
-# , 'my_video.mp4')
 
 
 
