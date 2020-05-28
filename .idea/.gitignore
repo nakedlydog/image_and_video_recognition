@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+*.jpg
+*.avi
+*.mp4
+*.xml
+*.pyc
+*.txt
+*.iml
