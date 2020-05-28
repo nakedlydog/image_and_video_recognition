@@ -6,14 +6,13 @@ class _VideoCapture:
         self.video = cv2.VideoCapture(video_source)
         if not self.video.isOpened():
             raise ValueError('Unable video source', video_source)
-
-        self.width = 700 # self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.height = 600 # self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        print(video_source)
+#        self.width = 700 # self.video.get(cv2.CAP_PROP_FRAME_WIDTH)
+#        self.height = 600 # self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
     def __del__(self):
         if self.video.isOpened():
             self.video.release()
-        self.window.mainloop()
 
     def get_frame(self):
         if self.video.isOpened():
