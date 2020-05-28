@@ -28,7 +28,7 @@ class App:
         self.is_new_video_choosen = False
         self.count_analyzed_video = 0
 
-        self.delay = 15
+        self.delay = 1
         self.update()
 
         self.window.mainloop()
@@ -63,17 +63,16 @@ class App:
         self.button_snapshot.pack(side=tkinter.LEFT)
 
     def update(self):
-        print(22)
         if self.is_new_video_choosen:
             self.video = _VideoCapture(self.path)
             self.is_new_video_choosen = False
 
         ret, frame = self.video.get_frame()
 
-        while True:
-            if not self.is_pause_video:
-                break
-            self.window.update()
+        if self.is_pause_video:
+            self.window.after(self.delay, self.update)
+            return
+        self.window.update()
 
         if ret:
             image = PIL.Image.fromarray(frame)
@@ -92,6 +91,7 @@ class App:
         self.is_pause_video = False
 
     def pause(self):
+        print("def pause(self)")
         self.is_pause_video = True
 
     def change_input(self, input_file=0):
@@ -121,7 +121,6 @@ class App:
 
     def play_analyzed(self):
         self.change_input(self.new_video_name + '.avi')
-        self.text['text'] = VideoRecognition.text[-1]
 
 
 
